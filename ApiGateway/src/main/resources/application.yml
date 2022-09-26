@@ -1,0 +1,50 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: articles
+          uri: lb://textaddict-article-api
+          predicates:
+            - Path=/article-api/articles/{id}
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/article-api/(?<segment>.*), /$\{segment}
+        - id: create-user
+          uri: lb://textaddict-user-api
+          predicates:
+            - Path=/user-api/users
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-api/(?<segment>.*), /$\{segment}
+        - id: login-user
+          uri: lb://textaddict-user-api
+          predicates:
+            - Path=/user-api/users/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-api/(?<segment>.*), /$\{segment}
+        - id: user-api
+          uri: lb://textaddict-user-api
+          predicates:
+            - Path=/user-api/users,/user-api/users/{id}
+            - Method=GET,POST,PUT,PATCH,DELETE
+            - Header=Authorization, Bearer (.*)
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-api/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: user-api-actuator
+          uri: lb://textaddict-user-api
+          predicates:
+            - Path=/user-api/actuator/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-api/(?<segment>.*), /$\{segment}
+      #discovery:
+        #locator:
+          #enabled: true
+          #lower-case-service-id: true
