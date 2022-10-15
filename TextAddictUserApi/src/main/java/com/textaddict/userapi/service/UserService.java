@@ -11,5 +11,9 @@ public interface UserService extends UserDetailsService {
     public User createUser(UserCreateRequest userCreateRequest);
 
     public User getUserDetailsByEmail(String email);
-    Optional<User> findUserById(UUID id);
+    public Optional<User> findUserById(UUID id);
+
+    public User saveUser(User user);
+
+    User findByIdForRoleUpdate(UUID id);
 }

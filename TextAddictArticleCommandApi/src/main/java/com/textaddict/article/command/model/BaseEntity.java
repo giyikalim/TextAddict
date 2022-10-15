@@ -1,4 +1,4 @@
-package com.textaddict.model;
+package com.textaddict.article.command.model;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;

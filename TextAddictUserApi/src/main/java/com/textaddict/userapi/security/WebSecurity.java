@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
@@ -16,7 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -24,6 +27,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    Environment environment;
 
     @Value("${token.expiration.time}")
     private Long tokenExpirationTime;
@@ -40,12 +46,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/actuator/health").permitAll()
-                .antMatchers(HttpMethod.GET,"/actuator/circuitbreakerevents").permitAll()
-        //http.authorizeRequests().antMatchers("/**").ip(gatewayIp)
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/users/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator/circuitbreakerevents").permitAll()
+                //http.authorizeRequests().antMatchers("/**").ip(gatewayIp)
                 .and()
-                .addFilter(getAuthenticationFilter());
+                .addFilter(getAuthenticationFilter())
+                .addFilter(getAuthorizationFilter());
     }
 
     /*protected void configure(HttpSecurity http) throws Exception {
@@ -66,8 +73,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
     }
 
-    private AuthenticationFilter getAuthenticationFilter() throws  Exception{
-        AuthenticationFilter authenticationFilter=new AuthenticationFilter(authenticationManager(), userService, tokenExpirationTime, tokenSecret, loginUrlPath);
+    private AuthenticationFilter getAuthenticationFilter() throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager(), userService, tokenExpirationTime, tokenSecret, loginUrlPath);
         return authenticationFilter;
+    }
+
+    private AuthorizationFilter getAuthorizationFilter() throws Exception {
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter(authenticationManager(), environment);
+        return authorizationFilter;
     }
 }

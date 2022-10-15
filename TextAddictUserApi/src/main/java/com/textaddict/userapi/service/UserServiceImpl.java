@@ -1,5 +1,7 @@
 package com.textaddict.userapi.service;
 
+import com.textaddict.constants.RoleEnum;
+import com.textaddict.userapi.model.Role;
 import com.textaddict.userapi.model.User;
 import com.textaddict.userapi.repository.UserRepository;
 import com.textaddict.userapi.ui.model.request.UserCreateRequest;
@@ -10,9 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,10 +21,20 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private RoleService roleService;
     @Override
     public User createUser(UserCreateRequest userCreateRequest){
         User user=new ModelMapper().map(userCreateRequest, User.class);
         user.setPassword(bCryptPasswordEncoder.encode(userCreateRequest.getPassword()));
+
+        Role role=roleService.findByRoleName(RoleEnum.LEARNER.getValue());
+
+        Set<Role> roles=new HashSet<>();
+        roles.add(role);
+
+        user.setRoles(roles);
         return userRepository.save(user);
     }
 
@@ -48,5 +58,13 @@ public class UserServiceImpl implements UserService {
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true, true, true, true, new ArrayList<>());
     }
 
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 
+    @Override
+    public User findByIdForRoleUpdate(UUID id) {
+        return userRepository.findByIdForRoleUpdate(id);
+    }
 }

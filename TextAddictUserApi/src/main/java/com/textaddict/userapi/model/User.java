@@ -1,18 +1,17 @@
 package com.textaddict.userapi.model;
 
-import com.textaddict.model.BaseEntity;
 import lombok.Data;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity {
     private String firstName;
     private String lastName;
@@ -23,4 +22,15 @@ public class User extends BaseEntity {
     private String profession;
     private String site;
     private String nickName;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name="user_role",
+            joinColumns = @JoinColumn( name="user_id"),
+            inverseJoinColumns = @JoinColumn( name="role_id")
+    )
+    private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    private List<DeniedUser> deniedUsers;
 }

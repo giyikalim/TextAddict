@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -57,7 +58,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         com.textaddict.userapi.model.User user = userService.getUserDetailsByEmail(((User) authResult.getPrincipal()).getUsername());
 
-        String token = Jwts.builder().setSubject(user.getId().toString())
+        String roles=user.getRoles().stream().map(r->"ROLE_"+r.getRole().toUpperCase()).collect(Collectors.joining(","));
+
+        String token = Jwts.builder().claim("roles", roles).setSubject(user.getId().toString())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenExpirationTime))
                 .signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
 
