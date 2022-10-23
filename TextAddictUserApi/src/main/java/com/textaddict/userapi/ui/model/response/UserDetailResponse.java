@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class UserCreateResponse extends UserDto {
+public class UserDetailResponse extends UserDto {
     @Override
     @JsonFormat(pattern="yyyy-MM-dd")
     public Date getBirthDate() {

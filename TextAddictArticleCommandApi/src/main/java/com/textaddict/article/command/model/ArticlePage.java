@@ -1,5 +1,6 @@
 package com.textaddict.article.command.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +19,7 @@ public class ArticlePage extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="article_id", nullable=false)
+    @JsonIgnore
     private Article article;
 
     @NotBlank(message = "Page content can not be empty")

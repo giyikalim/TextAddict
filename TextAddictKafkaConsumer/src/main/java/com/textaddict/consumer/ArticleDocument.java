@@ -1,5 +1,6 @@
 package com.textaddict.consumer;
 
+import com.textaddict.dto.ArticlePageDto;
 import com.textaddict.dto.UserDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class ArticleDocument {
     private String description;
     private List<String> keys;
     private List<UserDto> contributors;
+    private List<ArticlePageDto> pages;
     private Date createdDate;
     private Date modifiedDate;
     private UserDto creator;

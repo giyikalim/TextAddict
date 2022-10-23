@@ -1,10 +1,13 @@
 package com.textaddict.userapi.service;
 
 import com.textaddict.constants.RoleEnum;
+import com.textaddict.userapi.exceptions.UserNotFoundException;
 import com.textaddict.userapi.model.Role;
 import com.textaddict.userapi.model.User;
 import com.textaddict.userapi.repository.UserRepository;
 import com.textaddict.userapi.ui.model.request.UserCreateRequest;
+import com.textaddict.userapi.ui.model.request.ProfileEditRequest;
+import com.textaddict.userapi.ui.model.request.UserEditRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +42,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateUser(UserEditRequest userEditRequest, String userId){
+        Optional<User> userOptional=userRepository.findById(UUID.fromString(userId));
+        User user=userOptional.orElseThrow(()->new UserNotFoundException("User could not found"));
+
+        user.setFirstName(userEditRequest.getFirstName());
+        user.setLastName(userEditRequest.getLastName());
+        user.setEmail(userEditRequest.getEmail());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateProfile(ProfileEditRequest userEditRequest, String userId){
+        Optional<User> userOptional=userRepository.findById(UUID.fromString(userId));
+        User user=userOptional.orElseThrow(()->new UserNotFoundException("User could not found"));
+
+        user.setFirstName(userEditRequest.getFirstName());
+        user.setLastName(userEditRequest.getLastName());
+        user.setEmail(userEditRequest.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(userEditRequest.getPassword()));
+        return userRepository.save(user);
+    }
+
+    @Override
     public User getUserDetailsByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -66,5 +92,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByIdForRoleUpdate(UUID id) {
         return userRepository.findByIdForRoleUpdate(id);
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        return userRepository.findAllWithRole();
     }
 }

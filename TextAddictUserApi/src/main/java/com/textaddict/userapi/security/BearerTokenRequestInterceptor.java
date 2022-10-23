@@ -13,21 +13,20 @@ import java.util.regex.Pattern;
 
 @Component
 public class BearerTokenRequestInterceptor implements RequestInterceptor {
-        private static final Pattern BEARER_TOKEN_HEADER_PATTERN = Pattern.compile("^Bearer (?<token>[a-zA-Z0-9-._~+/]+=*)$",
-                Pattern.CASE_INSENSITIVE);
+    private static final Pattern BEARER_TOKEN_HEADER_PATTERN = Pattern.compile("^Bearer (?<token>[a-zA-Z0-9-._~+/]+=*)$",
+            Pattern.CASE_INSENSITIVE);
 
-        @Override
-        public void apply(RequestTemplate template) {
-            final String authorization = HttpHeaders.AUTHORIZATION;
-            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (Objects.nonNull(requestAttributes)) {
-                String authorizationHeader = requestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
-                Matcher matcher = BEARER_TOKEN_HEADER_PATTERN.matcher(authorizationHeader);
-                if (matcher.matches()) {
-                    // 清除token头 避免传染
-                    template.header(authorization);
-                    template.header(authorization, authorizationHeader);
-                }
+    @Override
+    public void apply(RequestTemplate template) {
+        final String authorization = HttpHeaders.AUTHORIZATION;
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (Objects.nonNull(requestAttributes)) {
+            String authorizationHeader = requestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+            Matcher matcher = BEARER_TOKEN_HEADER_PATTERN.matcher(authorizationHeader);
+            if (matcher.matches()) {
+                template.header(authorization);
+                template.header(authorization, authorizationHeader);
             }
         }
     }
+}

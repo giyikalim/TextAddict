@@ -1,0 +1,13 @@
+spring.cloud.stream:
+  function:
+    definition: articleConsumer
+  bindings:
+    articleConsumer-in-0:
+      destination: article-service-event
+      group: article-service-event-group
+  kafka:
+    binder:
+      brokers:
+        - localhost:9091
+        - localhost:9092
+        - localhost:9093

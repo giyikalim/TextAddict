@@ -2,6 +2,15 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: articles-write-read
+          uri: lb://textaddict-article-command-api
+          predicates:
+            - Path=/article-api/articles/author/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/article-api/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         - id: articles-read
           uri: lb://textaddict-article-query-api
           predicates:

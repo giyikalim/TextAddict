@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class UserEditRequest {
+public class ProfileEditRequest {
     @NotNull(message = "First name can not be null")
     @Size(min = 3, message = "First name can not be less then three characters")
     @Size(max = 30, message = "Firstname can not be longer then thırty characters")

@@ -9,12 +9,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import reactor.core.publisher.Flux;
+
+import java.util.function.Supplier;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableDiscoveryClient
 @EnableFeignClients
 public class TextAddictArticleCommandApiApplication{
+
+    @Bean
+    public FluxSinkImpl fluxSinkConsumer(){
+        return new FluxSinkImpl();
+    }
+
+    @Bean
+    public Supplier<Flux<String>> articleProducer(FluxSinkImpl fluxSinkConsumer){
+
+        Flux<String> articleFlux = Flux.create(fluxSinkConsumer).share();
+
+        return () -> articleFlux;
+    };
 
     public static void main(String[] args) {
         SpringApplication.run(TextAddictArticleCommandApiApplication.class, args);

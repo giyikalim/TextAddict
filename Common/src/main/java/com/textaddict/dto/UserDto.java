@@ -15,4 +15,8 @@ public class UserDto {
     private String profession;
     private String site;
     private String nickName;
+    private String uuid;
+    private boolean isAdmin;
+    private boolean isAuthor;
+    private boolean isReader;
 }

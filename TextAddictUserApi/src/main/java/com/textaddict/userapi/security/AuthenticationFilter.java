@@ -1,10 +1,14 @@
 package com.textaddict.userapi.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.textaddict.dto.UserDto;
+import com.textaddict.userapi.UserUtils;
 import com.textaddict.userapi.service.UserService;
 import com.textaddict.userapi.ui.model.request.LoginRequest;
+import com.textaddict.userapi.ui.model.response.UserDetailResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -67,6 +72,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         response.addHeader("token", token);
         response.addHeader("userId",user.getId().toString());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter writer=response.getWriter();
+        ObjectMapper objectMapper=new ObjectMapper();
+        ModelMapper modelMapper=new ModelMapper();
+        UserDetailResponse userDto=modelMapper.map(user, UserDetailResponse.class);
+        userDto.setUuid(user.getId().toString());
+        UserUtils.setAuthorities(userDto, user.getRoles());
+        writer.print(objectMapper.writeValueAsString(userDto));
+        writer.flush();
     }
 
     private UsernamePasswordAuthenticationToken getAuthRequest(

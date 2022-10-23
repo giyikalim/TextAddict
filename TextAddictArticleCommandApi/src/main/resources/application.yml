@@ -1,11 +1,32 @@
-spring:
+#spring:
+#  kafka:
+#    bootstrap-servers:
+#      - localhost:9091
+#      - localhost:9092
+#      - localhost:9093
+#    template:
+#      default-topic: article-service-event
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+spring.cloud.stream:
+  function:
+    definition: articleProducer
+  bindings:
+    articleProducer-out-0:
+      destination: article-service-event
+      producer:
+        use-native-encoding: true
   kafka:
-    bootstrap-servers:
-      - localhost:9091
-      - localhost:9092
-      - localhost:9093
-    template:
-      default-topic: article-service-event
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    bindings:
+      articleProducer-out-0:
+        producer:
+          configuration:
+            value:
+              serializer: org.apache.kafka.common.serialization.StringSerializer
+    binder:
+      brokers:
+        - localhost:9091
+        - localhost:9092
+        - localhost:9093

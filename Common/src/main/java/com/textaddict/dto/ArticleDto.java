@@ -17,4 +17,7 @@ public class ArticleDto {
     private Date createdDate;
     private UserDto creator;
     private Date modifiedDate;
+    private boolean reader;
+    private boolean admin;
+    private boolean author;
 }

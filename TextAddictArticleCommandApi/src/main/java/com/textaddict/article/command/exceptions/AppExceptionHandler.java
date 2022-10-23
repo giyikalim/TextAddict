@@ -30,6 +30,14 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(value = {ArticleNotFoundException.class, ArticlePageNotFoundException.class})
+    public ResponseEntity<Object> handleNotFoundException(AccessDeniedException ex, WebRequest request) {
+
+        String message = ex.getLocalizedMessage() == null ? ex.toString() : ex.getLocalizedMessage();
+        ErrorMessage errorMessage = ErrorMessage.builder().timestamp(new Date()).message(message).build();
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = {UserNotPermittedException.class})
     public ResponseEntity<Object> handleAnyException(UserNotPermittedException ex, WebRequest request) {
 
